@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+*.swp
+*.swo
+
+# Windows
+Thumbs.db
+ehthumbs.db
+*.lnk
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node (if you ever add build tools)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# IDE temp files
+*.tmp
+*~
+
+# OS temp
+.~*
