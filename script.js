@@ -18,6 +18,9 @@ const CONFIG = {
     // Correct password (case-insensitive, spaces trimmed)
     CORRECT_PASSWORD: 'Parasite breaches',
     
+    // Password for trials section
+    TRIALS_PASSWORD: 'unlock trials',
+    
     // Whether to log debug info to console
     DEBUG: false,
     
@@ -37,6 +40,7 @@ const STATE = {
     currentPhase: 1,
     isTransitioning: false,
     phase2Data: {},
+    trialsUnlocked: false,
 };
 
 // ===================================================================
@@ -281,12 +285,6 @@ function loadPhase2Section(section) {
         case 'trials':
             loadTrialsFiles(phase2View);
             break;
-        case 'newton':
-            loadNewtonFile(phase2View);
-            break;
-        case 'emily':
-            loadEmilyFile(phase2View);
-            break;
         case 'incidents':
             loadIncidentsFiles(phase2View);
             break;
@@ -301,7 +299,7 @@ function loadOverview(container) {
             <div class="file-header">
                 <p class="file-designation">STATUS: SYSTEM COMPROMISED</p>
                 <p class="file-title">DATABASE OVERVIEW</p>
-                <p class="file-status">Last Access: [CORRUPTED] | Records Accessible: 7 / 47</p>
+                <p class="file-status">Last Access: [CORRUPTED] | Records Accessible: 5 / 47</p>
             </div>
             <div class="file-content">
                 <p>
@@ -313,9 +311,7 @@ function loadOverview(container) {
                 </p>
                 <ul style="margin-left: 2rem; color: #00ff00; text-shadow: 0 0 5px rgba(0, 255, 0, 0.4);">
                     <li>THE GAP — Classified phenomenon documentation</li>
-                    <li>TRIAL FILES — Subject containment records</li>
-                    <li>PROFESSOR NEWTON — Personnel file (CORRUPTED)</li>
-                    <li>EMILY CHEN — Personnel file (PARTIAL)</li>
+                    <li>TRIAL FILES — Subject containment records [RESTRICTED]</li>
                     <li>INCIDENT REPORTS — Multiple files (SEVERE CORRUPTION)</li>
                 </ul>
                 <p style="margin-top: 1.5rem;">
@@ -360,7 +356,7 @@ function loadGapFile(container) {
                 
                 <p>
                     <strong>ROAB INVESTIGATION STATUS:</strong>
-                    Professor Newton designated The Gap as the primary research focus in 2009. Resources were redirected toward:
+                    Primary research focus has been devoted to understanding The Gap. Resources were redirected toward:
                 </p>
                 
                 <ul style="margin-left: 2rem;">
@@ -383,46 +379,68 @@ function loadGapFile(container) {
 }
 
 function loadTrialsFiles(container) {
+    if (!STATE.trialsUnlocked) {
+        // Show password prompt
+        container.innerHTML = `
+            <div class="file-section">
+                <div class="file-header">
+                    <p class="file-designation">FILES: TRIAL-001 through TRIAL-004 | CLASSIFICATION: OMEGA</p>
+                    <p class="file-title">TRIAL SUBJECT FILES</p>
+                    <p class="file-status">STATUS: ACCESS RESTRICTED - PASSWORD REQUIRED</p>
+                </div>
+                <div class="file-content">
+                    <p style="text-align: center; margin: 2rem 0;">
+                        This section contains restricted trial subject information.
+                    </p>
+                    <p style="text-align: center;">
+                        <input type="password" id="trials-password" class="auth-input" placeholder="Enter password" style="width: 70%; max-width: 300px;">
+                    </p>
+                    <p style="text-align: center;">
+                        <button onclick="unlockTrials()" class="auth-button" style="width: 200px; margin-top: 1rem;">[ UNLOCK ]</button>
+                    </p>
+                    <p id="trials-error" class="auth-error hidden" style="text-align: center; margin-top: 1rem;">
+                        ACCESS DENIED - Incorrect password.
+                    </p>
+                </div>
+            </div>
+        `;
+        document.getElementById('trials-password').focus();
+        return;
+    }
+    
+    // Show trial files
     const trials = [
         {
             name: 'Fate — The Lost Vow',
             designation: 'TRIAL-001',
-            abilities: 'Reality manipulation, entity communication, dimensional perception',
-            behavior: 'Docile when treated with respect. Responsive to Emily Chen.',
+            behavior: 'Docile when treated with respect.',
             containment: 'Minimal physical restraint. Psychological containment effective.',
-            relationship: 'Trusted Emily Chen explicitly. Refused communication with other staff.',
             status: '[CONTAINED → MISSING]',
             notes: 'Subject expressed desire to help. Status unknown after facility breach.'
         },
         {
             name: 'Fallen Knight',
             designation: 'TRIAL-002',
-            abilities: 'Enhanced physicality, temporal distortion, pattern recognition',
             behavior: 'Aggressive when challenged. Protective of other subjects.',
             containment: 'Heavy physical restraint necessary. Psychological manipulation ineffective.',
-            relationship: 'Dependent on Fate for emotional stability.',
             status: '[CONTAINED → RELEASED]',
-            notes: 'Release circumstances unclear. Emily Chen allegedly involved in containment breach.'
+            notes: 'Release circumstances unclear. Containment breach occurred during system collapse.'
         },
         {
             name: 'False Shepherd',
             designation: 'TRIAL-003',
-            abilities: 'Mass influence, identity manipulation, hive-mind coordination',
             behavior: 'Deceptive. Frequently attempts psychological manipulation of staff.',
             containment: 'Isolation protocols mandatory. No direct contact without protection.',
-            relationship: 'Minimal trust toward staff. Showed resistance to Emily Chen.',
             status: '[CONTAINED → MISSING]',
             notes: 'Subject attempted multiple containment breaches. Motive unclear.'
         },
         {
             name: 'Morrow',
             designation: 'TRIAL-004',
-            abilities: 'Temporal acceleration, degradation fields, entropy manipulation',
             behavior: 'Withdrawn. Minimal verbal communication. Occasionally hostile.',
             containment: 'Specialized temporal stabilization equipment required.',
-            relationship: 'Indifferent to most staff. Peculiar attachment to Emily Chen.',
             status: '[CONTAINED → LOCATION UNKNOWN]',
-            notes: 'Subject appeared to communicate with Emily before disappearance. Recovery impossible.'
+            notes: 'Subject disappeared during facility collapse. Recovery status unknown.'
         }
     ];
     
@@ -443,20 +461,12 @@ function loadTrialsFiles(container) {
                 <p class="trial-designation">${trial.designation}</p>
                 <div class="trial-details">
                     <div class="trial-field">
-                        <p class="trial-field-label">KNOWN ABILITIES:</p>
-                        <p class="trial-field-value">${trial.abilities}</p>
-                    </div>
-                    <div class="trial-field">
                         <p class="trial-field-label">BEHAVIORAL NOTES:</p>
                         <p class="trial-field-value">${trial.behavior}</p>
                     </div>
                     <div class="trial-field">
                         <p class="trial-field-label">CONTAINMENT METHOD:</p>
                         <p class="trial-field-value">${trial.containment}</p>
-                    </div>
-                    <div class="trial-field">
-                        <p class="trial-field-label">RELATIONSHIP TO STAFF:</p>
-                        <p class="trial-field-value">${trial.relationship}</p>
                     </div>
                     <div class="trial-field">
                         <p class="trial-field-label">CURRENT STATUS:</p>
@@ -474,112 +484,22 @@ function loadTrialsFiles(container) {
     container.innerHTML = trialsHTML;
 }
 
-function loadNewtonFile(container) {
-    container.innerHTML = `
-        <div class="file-section">
-            <div class="file-header">
-                <p class="file-designation">PERSONNEL FILE | ID: NEWTON-001</p>
-                <p class="file-title">PROFESSOR NEWTON</p>
-                <p class="file-status">STATUS: <span style="color: #ff0000;">MISSING - PRESUMED [EXPUNGED]</span></p>
-            </div>
-            <div class="file-content">
-                <p>
-                    <strong>FULL NAME:</strong> Professor <span class="corrupted-text">███████ █████████</span><br>
-                    <strong>POSITION:</strong> Founder / Lead Researcher<br>
-                    <strong>TENURE:</strong> 1987 — [CORRUPTED]
-                </p>
-                
-                <p>
-                    <strong>BIOGRAPHY:</strong>
-                    Founder of ROAB in 1987. Ph.D. in Theoretical Physics. Pioneering researcher into anomalous phenomena. Maintained strict operational control over ROAB research protocols.
-                </p>
-                
-                <p>
-                    <strong>RESEARCH FOCUS:</strong>
-                    Primary investigator of The Gap phenomenon. Dedicated resources to containment and study of Trial subjects. Developed initial theoretical frameworks for cross-universal physics.
-                </p>
-                
-                <p>
-                    <strong>LAST KNOWN ACTIVITY:</strong><br>
-                    [CORRUPTED - 47% DATA LOSS]
-                </p>
-                
-                <p style="background-color: #1a1a2e; padding: 1rem; margin: 1rem 0; border-left: 4px solid #ff0000;">
-                    🔴 CRITICAL NOTE: [DATA EXPUNGED] — Professor Newton's final log entry contains references to [ACCESS LEVEL INSUFFICIENT]. Following this entry, all communications ceased. Facility status deteriorated rapidly.
-                </p>
-                
-                <p>
-                    <strong>PERSONAL NOTES (CORRUPTED):</strong>
-                </p>
-                
-                <p style="color: #ff0000; font-style: italic;">
-                    "I cannot [███] what The Gap truly is. The Trials are not specimens. They are [CORRUPTED]. Emily understands this. She sees [DATA EXPUNGED] that I can no longer see. Perhaps she was right. Perhaps [███████████] was the only option. The pain [CORRUPTED] and I cannot [█████] it anymore."
-                </p>
-                
-                <p style="margin-top: 1.5rem;">
-                    <strong>FILE INTEGRITY:</strong> <span class="corrupted-text">45% CORRUPTED</span>
-                </p>
-            </div>
-        </div>
-    `;
-}
-
-function loadEmilyFile(container) {
-    container.innerHTML = `
-        <div class="file-section">
-            <div class="file-header">
-                <p class="file-designation">PERSONNEL FILE | ID: EMILY-007</p>
-                <p class="file-title">EMILY CHEN</p>
-                <p class="file-status">STATUS: UNKNOWN</p>
-            </div>
-            <div class="file-content">
-                <p>
-                    <strong>FULL NAME:</strong> Emily Chen<br>
-                    <strong>POSITION:</strong> Junior Researcher / Field Staff<br>
-                    <strong>TENURE:</strong> 2015 — [CORRUPTED]
-                </p>
-                
-                <p>
-                    <strong>BIOGRAPHY:</strong>
-                    Joined ROAB in 2015. Specialized in behavioral observation and subject care protocols. Known for compassionate approach to research subjects. Rapidly gained the trust of Trial subjects, particularly Fate.
-                </p>
-                
-                <p>
-                    <strong>ROLE IN TRIALS CONTAINMENT:</strong>
-                    Assigned to direct observation and care duties for Trial subjects. Unlike other staff, Emily consistently achieved cooperation from subjects through empathetic interaction rather than force.
-                </p>
-                
-                <p style="background-color: #1a1a2e; padding: 1rem; margin: 1rem 0; border-left: 4px solid #00ff00;">
-                    🟢 BEHAVIORAL OBSERVATION: Emily brought food to the Trials during her shifts. She communicated with them. She treated them as individuals rather than specimens. The Trials responded to this kindness.
-                </p>
-                
-                <p>
-                    <strong>CRITICAL INCIDENT — FACILITY BREACH:</strong>
-                </p>
-                
-                <p>
-                    During the facility collapse event, containment systems failed. The Trial subjects escaped. Security footage shows Emily Chen deliberately disabling multiple containment locks. She appeared to [CORRUPTED] the Trials.
-                </p>
-                
-                <p style="color: #00ff00; margin-top: 1rem;">
-                    When questioned about her actions, Emily stated: "I couldn't keep them here anymore. They aren't dangerous. They're just [DATA EXPUNGED]. I had to let them go."
-                </p>
-                
-                <p style="margin-top: 1rem;">
-                    <strong>INTERPRETATION:</strong>
-                    Emily Chen deliberately released the Trial subjects when ROAB began to collapse. She believed this was the only way to save them. Whether her actions were justified remains unclear. Her current whereabouts are unknown.
-                </p>
-                
-                <p style="color: #ff0000; margin-top: 1.5rem; font-weight: bold;">
-                    ⚠ NOTE: Fate and Emily shared a unique bond. In the hours before the breach, surveillance logs show Fate communicating [DATA EXPUNGED] only to Emily. The content of their final conversation has been [ACCESS LEVEL INSUFFICIENT].
-                </p>
-                
-                <p style="margin-top: 1rem;">
-                    <strong>FILE INTEGRITY:</strong> <span class="corrupted-text">33% CORRUPTED</span>
-                </p>
-            </div>
-        </div>
-    `;
+function unlockTrials() {
+    const trialsPassword = document.getElementById('trials-password');
+    const userPassword = trialsPassword.value.trim().toLowerCase();
+    const correctPassword = CONFIG.TRIALS_PASSWORD.toLowerCase();
+    
+    if (CONFIG.DEBUG) console.log('Trials password attempt:', userPassword);
+    
+    if (userPassword === correctPassword) {
+        STATE.trialsUnlocked = true;
+        loadTrialsFiles(document.getElementById('phase2-view'));
+    } else {
+        const error = document.getElementById('trials-error');
+        error.classList.remove('hidden');
+        trialsPassword.value = '';
+        trialsPassword.focus();
+    }
 }
 
 function loadIncidentsFiles(container) {
@@ -602,7 +522,7 @@ function loadIncidentsFiles(container) {
         {
             name: 'TRIAL_CONTAINMENT_BREACH',
             status: 'CRITICAL - 89% LOST',
-            preview: '[REDACTED] — Breach event timeline unrecoverable. All subjects [STATUS UNKNOWN]. Emily Chen [DATA EXPUNGED]. Security protocols [SYSTEM FAILURE].'
+            preview: '[REDACTED] — Breach event timeline unrecoverable. All subjects [STATUS UNKNOWN]. Security protocols [SYSTEM FAILURE].'
         },
         {
             name: 'STAFF_STATUS_FINAL',
@@ -715,7 +635,6 @@ function activateEasterEgg() {
             <p style="color: #00ff00; font-family: monospace; font-size: 1.2rem; text-align: center; text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);">
                 01001001 01010100 01010011 00100000 01010000 01001001 01010100 01010101<br><br>
                 THE TRIALS DID NOT WANT TO HURT ANYONE<br><br>
-                EMILY UNDERSTOOD
             </p>
             <button onclick="this.parentElement.remove()" style="margin-top: 2rem; padding: 10px 20px; background: #ff0000; color: white; border: none; cursor: pointer; font-family: monospace;">
                 CLOSE
