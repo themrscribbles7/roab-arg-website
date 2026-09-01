@@ -19,7 +19,10 @@ const CONFIG = {
     CORRECT_PASSWORD: 'Parasite breaches',
     
     // Password for trials section
-    TRIALS_PASSWORD: 'unlock trials',
+    TRIALS_PASSWORD: 'unlock',
+    
+    // Password for parasite section
+    PARASITE_PASSWORD: 'prevent my mistake',
     
     // Whether to log debug info to console
     DEBUG: false,
@@ -41,6 +44,7 @@ const STATE = {
     isTransitioning: false,
     phase2Data: {},
     trialsUnlocked: false,
+    parasiteUnlocked: false,
 };
 
 // ===================================================================
@@ -285,6 +289,9 @@ function loadPhase2Section(section) {
         case 'trials':
             loadTrialsFiles(phase2View);
             break;
+        case 'parasite':
+            loadParasiteFiles(phase2View);
+            break;
         case 'incidents':
             loadIncidentsFiles(phase2View);
             break;
@@ -299,7 +306,7 @@ function loadOverview(container) {
             <div class="file-header">
                 <p class="file-designation">STATUS: SYSTEM COMPROMISED</p>
                 <p class="file-title">DATABASE OVERVIEW</p>
-                <p class="file-status">Last Access: [CORRUPTED] | Records Accessible: 5 / 47</p>
+                <p class="file-status">Last Access: [CORRUPTED] | Records Accessible: 6 / 47</p>
             </div>
             <div class="file-content">
                 <p>
@@ -312,6 +319,7 @@ function loadOverview(container) {
                 <ul style="margin-left: 2rem; color: #00ff00; text-shadow: 0 0 5px rgba(0, 255, 0, 0.4);">
                     <li>THE GAP — Classified phenomenon documentation</li>
                     <li>TRIAL FILES — Subject containment records [RESTRICTED]</li>
+                    <li>PARASITE RESEARCH — Anomalous organism documentation [RESTRICTED]</li>
                     <li>INCIDENT REPORTS — Multiple files (SEVERE CORRUPTION)</li>
                 </ul>
                 <p style="margin-top: 1.5rem;">
@@ -411,36 +419,40 @@ function loadTrialsFiles(container) {
     // Show trial files
     const trials = [
         {
-            name: 'Fate — The Lost Vow',
+            name: 'Morrow',
             designation: 'TRIAL-001',
-            behavior: 'Docile when treated with respect.',
-            containment: 'Minimal physical restraint. Psychological containment effective.',
+            behavior: 'Subject remains motionless for extended periods until something enters vicinity. Frequently frozen at sound of children laughing, suggesting retained memories. Excessive squirming when shown family photos.',
+            containment: 'Specialized temporal stabilization equipment required. Subject displays erratic combat movements and unpredictable behavior.',
+            status: '[CONTAINED → LOCATION UNKNOWN]',
+            notes: 'Previous identity: Matteo █████, ROAB security officer. Subject appears conscious but lacks control over own body. Lock discovered in chest cavity with missing family photo.',
+            abilities: 'Extreme joint rotation, sudden speed bursts, tissue regeneration, ability to produce smaller hostile organisms'
+        },
+        {
+            name: 'The False Shepherd',
+            designation: 'TRIAL-002',
+            behavior: 'Displays calm and cooperative behavior during all recorded interactions. Willingly entered Foundation custody without resistance.',
+            containment: 'Minimal physical restraint. Subject conceals true combat capabilities.',
             status: '[CONTAINED → MISSING]',
-            notes: 'Subject expressed desire to help. Status unknown after facility breach.'
+            notes: 'Complete parasite synchronisation without visible mutation. Two independent conscious entities in same host with unprecedented coexistence level. Subject stated: "I determined there was no reason to resist it."',
+            abilities: 'Destabilization of nearby personnel causing irrational behavior, massive biological form with extreme physical strength, complete identity/personality influence'
         },
         {
             name: 'Fallen Knight',
-            designation: 'TRIAL-002',
+            designation: 'TRIAL-003',
             behavior: 'Aggressive when challenged. Protective of other subjects.',
             containment: 'Heavy physical restraint necessary. Psychological manipulation ineffective.',
             status: '[CONTAINED → RELEASED]',
-            notes: 'Release circumstances unclear. Containment breach occurred during system collapse.'
+            notes: 'Release circumstances unclear. Containment breach occurred during system collapse.',
+            abilities: 'Enhanced physicality, temporal distortion, pattern recognition'
         },
         {
-            name: 'False Shepherd',
-            designation: 'TRIAL-003',
-            behavior: 'Deceptive. Frequently attempts psychological manipulation of staff.',
-            containment: 'Isolation protocols mandatory. No direct contact without protection.',
-            status: '[CONTAINED → MISSING]',
-            notes: 'Subject attempted multiple containment breaches. Motive unclear.'
-        },
-        {
-            name: 'Morrow',
+            name: 'The Final Vow',
             designation: 'TRIAL-004',
-            behavior: 'Withdrawn. Minimal verbal communication. Occasionally hostile.',
-            containment: 'Specialized temporal stabilization equipment required.',
-            status: '[CONTAINED → LOCATION UNKNOWN]',
-            notes: 'Subject disappeared during facility collapse. Recovery status unknown.'
+            behavior: 'Remains motionless for extended periods. Attention appears focused on objects or locations without visible significance. Noticeably less tense when positioned with Trial-001.',
+            containment: 'Subject does not display immediate defensive behavior when confronted.',
+            status: '[CONTAINED → UNCONTAINED]',
+            notes: 'Subject spent significant time in Gap presence with entity designated "The guardian." Records indicate subject displayed different behavior in entity presence. One damaged record states "She stays near him." Another: "They always find each other."',
+            abilities: 'Spherical manifestations that intercept attacks, instantaneous object manifestation, unstable energy envelope, independent defensive systems'
         }
     ];
     
@@ -467,6 +479,10 @@ function loadTrialsFiles(container) {
                     <div class="trial-field">
                         <p class="trial-field-label">CONTAINMENT METHOD:</p>
                         <p class="trial-field-value">${trial.containment}</p>
+                    </div>
+                    <div class="trial-field">
+                        <p class="trial-field-label">KNOWN ABILITIES:</p>
+                        <p class="trial-field-value">${trial.abilities}</p>
                     </div>
                     <div class="trial-field">
                         <p class="trial-field-label">CURRENT STATUS:</p>
@@ -502,6 +518,107 @@ function unlockTrials() {
     }
 }
 
+function loadParasiteFiles(container) {
+    if (!STATE.parasiteUnlocked) {
+        // Show password prompt
+        container.innerHTML = `
+            <div class="file-section">
+                <div class="file-header">
+                    <p class="file-designation">FILE: PARASITE-001 | CLASSIFICATION: OMEGA</p>
+                    <p class="file-title">PARASITIC ANOMALY RESEARCH</p>
+                    <p class="file-status">STATUS: ACCESS RESTRICTED - PASSWORD REQUIRED</p>
+                </div>
+                <div class="file-content">
+                    <p style="text-align: center; margin: 2rem 0;">
+                        This section contains restricted parasitic organism research data.
+                    </p>
+                    <p style="text-align: center;">
+                        <input type="password" id="parasite-password" class="auth-input" placeholder="Enter password" style="width: 70%; max-width: 300px;">
+                    </p>
+                    <p style="text-align: center;">
+                        <button onclick="unlockParasite()" class="auth-button" style="width: 200px; margin-top: 1rem;">[ UNLOCK ]</button>
+                    </p>
+                    <p id="parasite-error" class="auth-error hidden" style="text-align: center; margin-top: 1rem;">
+                        ACCESS DENIED - Incorrect password.
+                    </p>
+                </div>
+            </div>
+        `;
+        document.getElementById('parasite-password').focus();
+        return;
+    }
+    
+    // Show parasite files
+    container.innerHTML = `
+        <div class="file-section">
+            <div class="file-header">
+                <p class="file-designation">FILE: PARASITE-001 | CLASSIFICATION: OMEGA</p>
+                <p class="file-title">PARASITIC ANOMALY RESEARCH</p>
+                <p class="file-status">STATUS: CRITICAL DISCOVERY</p>
+            </div>
+            <div class="file-content">
+                <p>
+                    <strong>ORGANISM CLASSIFICATION:</strong> Unknown Parasitic Entity<br>
+                    <strong>THREAT LEVEL:</strong> Catastrophic<br>
+                    <strong>RESEARCHER:</strong> The Professor
+                </p>
+                
+                <p style="margin-top: 1.5rem; background-color: #1a1a2e; padding: 1rem; border-left: 4px solid #ff0000;">
+                    <strong>🔴 CRITICAL OBSERVATION:</strong><br>
+                    The organism does not behave like any parasite currently known to ROAB. It does not appear to require a conventional biological host. It can survive independently for extended periods, yet displays an unusual preference for attaching itself to living organisms.
+                </p>
+                
+                <p style="margin-top: 1rem;">
+                    <strong>INFECTION MECHANISM:</strong>
+                    The parasite is capable of interfacing directly with the nervous system. It does not merely alter the body—it learns how the body works and modifies it accordingly. The more resistance the host displays, the more aggressively the parasite adapts.
+                </p>
+                
+                <p style="margin-top: 1rem;">
+                    <strong>CONTROL METHODOLOGY:</strong>
+                    The parasite does not always need to directly control its host. In certain cases, it can influence decision-making without the victim realizing they are being influenced. Subjects continue to believe their actions are their own. They insist they are thinking clearly. They insist nothing is wrong. Yet their behaviour changes progressively. Morality deteriorates. Judgement deteriorates.
+                </p>
+                
+                <p style="margin-top: 1rem; background-color: #1a1a2e; padding: 1rem; border-left: 4px solid #ff0000;">
+                    <strong>⚠️ WARNING - TRANSMISSION CAPABILITY:</strong><br>
+                    We have confirmed that the parasite can spread without direct physical contact. The process is subtle. Almost invisible. It can remain dormant within an environment before attaching itself to another host. There is no obvious outbreak. No warning. No immediate symptoms. It simply waits.
+                </p>
+                
+                <p style="margin-top: 1rem;">
+                    <strong>PERSONALITY OBSERVATION:</strong>
+                    The parasite may not erase the host's personality. It may simply bury it. If that is true, then every Trial may still be in there somewhere. Watching. Listening. Unable to move.
+                </p>
+                
+                <p style="margin-top: 1rem; color: #ff0000; font-style: italic;">
+                    "The parasite doesn't need to destroy ROAB. It doesn't need to attack us. It doesn't even need to take control. All it needs is for us to believe we're still in control."
+                </p>
+                
+                <p style="margin-top: 1.5rem; text-align: right; color: #00ff00;">
+                    — Professor
+                </p>
+            </div>
+        </div>
+    `;
+}
+
+function unlockParasite() {
+    const parasitePassword = document.getElementById('parasite-password');
+    const userPassword = parasitePassword.value.trim().toLowerCase();
+    const correctPassword = CONFIG.PARASITE_PASSWORD.toLowerCase();
+    
+    if (CONFIG.DEBUG) console.log('Parasite password attempt:', userPassword);
+    
+    if (userPassword === correctPassword) {
+        playSound('gunfire');
+        STATE.parasiteUnlocked = true;
+        loadParasiteFiles(document.getElementById('phase2-view'));
+    } else {
+        const error = document.getElementById('parasite-error');
+        error.classList.remove('hidden');
+        parasitePassword.value = '';
+        parasitePassword.focus();
+    }
+}
+
 function loadIncidentsFiles(container) {
     const incidents = [
         {
@@ -512,12 +629,12 @@ function loadIncidentsFiles(container) {
         {
             name: 'PARASITE_RESEARCH',
             status: 'PARTIAL RECOVERY',
-            preview: 'Project designation [CORRUPTED]. Research into [DATA EXPUNGED] entities discovered in Gap phenomenon. Results suggest [ACCESS LEVEL INSUFFICIENT]. Final tests were scheduled but [CORRUPTED].'
+            preview: 'Project designation [CORRUPTED]. Research into [DATA EXPUNGED] entities discovered in Gap phenomenon. Results suggest [ACCESS LEVEL INSUFFICIENT]. Final tests were scheduled[...]'
         },
         {
             name: 'GAP_OBSERVATION_LOG',
             status: 'HEAVILY CORRUPTED',
-            preview: '[SYSTEM FAILURE] — Observation data from [█████████] station lost. Final recorded transmission: "The Gap is [███████████████]. It\'s not opening. It\'s [CORRUPTED]."'
+            preview: '[SYSTEM FAILURE] — Observation data from [█████████] station lost. Final recorded transmission: "The Gap is [██████████████]...'
         },
         {
             name: 'TRIAL_CONTAINMENT_BREACH',
@@ -573,7 +690,6 @@ function toggleTrialDetails(element) {
 function playSound(soundName) {
     // This function is structured to accept sound names
     // Audio files can be added later in an audio/ directory
-    // Currently commented out to prevent errors if audio files don't exist
     
     const audioFiles = {
         'popup': 'audio/popup.mp3',
@@ -581,15 +697,14 @@ function playSound(soundName) {
         'access-granted': 'audio/access-granted.mp3',
         'glitch': 'audio/glitch.mp3',
         'flicker': 'audio/flicker.mp3',
+        'gunfire': 'audio/gunfire.mp3',
     };
     
     // Uncomment when audio files are added:
-    /*
     if (audioFiles[soundName]) {
         const audio = new Audio(audioFiles[soundName]);
         audio.play().catch(e => console.log('Audio playback failed:', e));
     }
-    */
     
     if (CONFIG.DEBUG) console.log('Sound triggered:', soundName);
 }
