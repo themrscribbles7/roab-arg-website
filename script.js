@@ -437,21 +437,21 @@ function loadTrialsFiles(container) {
             abilities: 'Destabilization of nearby personnel causing irrational behavior, massive biological form with extreme physical strength, complete identity/personality influence'
         },
         {
-            name: 'Fallen Knight',
+            name: 'The Knight',
             designation: 'TRIAL-003',
-            behavior: 'Aggressive when challenged. Protective of other subjects.',
-            containment: 'Heavy physical restraint necessary. Psychological manipulation ineffective.',
+            behavior: 'Remains completely motionless until designated target enters vicinity. Once engaged, relentlessly pursues target with considerable combat discipline. Demonstrates no observable concern for injuries sustained during combat.',
+            containment: 'Subject recovered from Rift with catastrophic structural damage and deep lacerations. Despite injuries that should render subject incapable of movement, evidence suggests continued fighting for extended period. Synchronization process proved exceptionally difficult due to extreme resistance.',
             status: '[CONTAINED → RELEASED]',
-            notes: 'Release circumstances unclear. Containment breach occurred during system collapse.',
-            abilities: 'Enhanced physicality, temporal distortion, pattern recognition'
+            notes: 'Subject remained fully conscious during synchronization and repeatedly attempted to remove infected tissue. Displayed clear awareness of parasite influence. During final stage, deliberately severed both upper limbs using own weapon. Parasite regenerated missing limbs. Subject repeatedly stated: "I would much rather die than become a tool." Subject demonstrates repeated protective behavior toward Trial-04. Attempts to isolate subjects strongly discouraged.',
+            abilities: 'Exceptional combat awareness, advanced weapon proficiency, high physical endurance, rapid reaction time, precise targeting, strong defensive instincts, complete disregard for personal injury, organized and disciplined combat style'
         },
         {
             name: 'The Final Vow',
             designation: 'TRIAL-004',
-            behavior: 'Remains motionless for extended periods. Attention appears focused on objects or locations without visible significance. Noticeably less tense when positioned with Trial-001.',
+            behavior: 'Remains motionless for extended periods. Attention appears focused on objects or locations without visible significance. Noticeably less tense when positioned with Trial-03.',
             containment: 'Subject does not display immediate defensive behavior when confronted.',
             status: '[CONTAINED → UNCONTAINED]',
-            notes: 'Subject spent significant time in Gap presence with entity designated "The guardian." Records indicate subject displayed different behavior in entity presence. One damaged record states "She stays near him." Another: "They always find each other."',
+            notes: 'Subject spent significant time in Gap presence with entity designated "The guardian." Records indicate subject displayed different behavior in entity presence. One damaged record states "She stays near him." Another: "They always find each other." Familial relationship with Trial-03 confirmed.',
             abilities: 'Spherical manifestations that intercept attacks, instantaneous object manifestation, unstable energy envelope, independent defensive systems'
         }
     ];
@@ -688,25 +688,60 @@ function toggleTrialDetails(element) {
 // ===================================================================
 
 function playSound(soundName) {
-    // This function is structured to accept sound names
-    // Audio files can be added later in an audio/ directory
+    if (soundName === 'gunfire') {
+        // Generate gunfire sound using Web Audio API (no file needed)
+        playGunfireSound();
+        if (CONFIG.DEBUG) console.log('Gunfire sound triggered');
+        return;
+    }
     
+    // Try to play audio file
     const audioFiles = {
         'popup': 'audio/popup.mp3',
         'error': 'audio/error.mp3',
         'access-granted': 'audio/access-granted.mp3',
         'glitch': 'audio/glitch.mp3',
         'flicker': 'audio/flicker.mp3',
-        'gunfire': 'audio/gunfire.mp3',
     };
     
-    // Uncomment when audio files are added:
     if (audioFiles[soundName]) {
         const audio = new Audio(audioFiles[soundName]);
         audio.play().catch(e => console.log('Audio playback failed:', e));
     }
     
     if (CONFIG.DEBUG) console.log('Sound triggered:', soundName);
+}
+
+function playGunfireSound() {
+    try {
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioContext.currentTime;
+        
+        // Create multiple gunshots with different timing
+        for (let i = 0; i < 3; i++) {
+            const startTime = now + (i * 0.1);
+            
+            // Oscillator for the gunshot
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            // Gunshot pitch sweep
+            osc.frequency.setValueAtTime(200, startTime);
+            osc.frequency.exponentialRampToValueAtTime(50, startTime + 0.1);
+            
+            // Volume envelope
+            gain.gain.setValueAtTime(0.3, startTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+            
+            osc.start(startTime);
+            osc.stop(startTime + 0.2);
+        }
+    } catch (e) {
+        console.log('Web Audio API not available:', e);
+    }
 }
 
 // ===================================================================
